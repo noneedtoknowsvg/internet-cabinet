@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Internet Cabinet — A Field Guide to the Web</title>
+<style>
+:root{
+ --paper:#f4f0e5;--paper2:#ebe5d6;--ink:#292d24;--muted:#777665;--olive:#626b4b;
+ --olive2:#dce0ce;--rust:#a35e42;--line:#d3cbb8;--white:#fbf9f1;--shadow:0 5px 20px #342f2010;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:Georgia,"Times New Roman",serif}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+a{color:inherit}
+.shell{max-width:1320px;margin:auto;padding:24px 30px 60px}
+.topline{display:flex;justify-content:space-between;gap:14px;align-items:center;border-bottom:1px solid var(--line);padding:0 0 12px;font:11px/1.4 Arial,sans-serif;letter-spacing:.15em;text-transform:uppercase;color:var(--muted)}
+.status{display:flex;align-items:center;gap:8px}.dot{width:7px;height:7px;border-radius:50%;background:var(--olive)}
+.masthead{display:grid;grid-template-columns:1fr 180px;gap:24px;align-items:center;padding:28px 0 22px}
+.kicker{font:11px Arial,sans-serif;letter-spacing:.18em;text-transform:uppercase;color:var(--rust);margin-bottom:12px}
+h1{font-size:clamp(42px,7vw,84px);font-weight:normal;letter-spacing:-.055em;line-height:.9;margin:0;max-width:800px}
+.subtitle{font-size:17px;font-style:italic;color:var(--muted);margin:18px 0 0}
+.stamp{border:1px solid var(--olive);padding:12px 8px;text-align:center;transform:rotate(3deg);color:var(--olive);font:10px/1.5 Arial,sans-serif;letter-spacing:.15em;text-transform:uppercase}
+.stamp strong{display:block;font:normal 26px Georgia,serif;letter-spacing:0;padding:5px}
+.rule{border:0;border-top:3px double var(--ink);margin:4px 0 22px}
+.toolbar{display:grid;grid-template-columns:minmax(180px,1fr) auto auto;gap:10px;margin:18px 0 24px;align-items:center}
+.searchwrap{display:flex;gap:10px;align-items:center;border:1px solid var(--line);background:var(--white);padding:0 13px;min-height:46px}
+.searchwrap input{border:0;outline:0;background:transparent;width:100%;font:14px Arial,sans-serif}
+.btn{border:1px solid var(--olive);background:var(--olive);color:#fffdf4;padding:12px 15px;font:11px Arial,sans-serif;letter-spacing:.07em;text-transform:uppercase}
+.btn.secondary{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn:hover{filter:brightness(.95)}
+.sectionhead{display:flex;justify-content:space-between;gap:15px;align-items:end;margin:30px 0 13px}
+.sectionhead h2{font-size:26px;font-weight:normal;margin:0;letter-spacing:-.03em}
+.sectionhead p{font:12px Arial,sans-serif;color:var(--muted);margin:5px 0 0}
+.smallcaps{font:10px Arial,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.departments{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px}
+.dept{background:var(--paper2);border:1px solid var(--line);text-align:left;padding:15px 15px 14px;min-height:140px;position:relative;transition:transform .15s,border-color .15s}
+.dept:hover,.dept.active{border-color:var(--olive);transform:translateY(-2px)}
+.dept.active{background:var(--olive2)}
+.dept .num{font:10px Arial,sans-serif;color:var(--rust);letter-spacing:.13em}
+.dept .glyph{position:absolute;right:13px;top:10px;font-size:22px;color:var(--olive)}
+.dept h3{font-size:19px;font-weight:normal;line-height:1.1;margin:22px 0 7px}
+.dept p{font:11px/1.45 Arial,sans-serif;color:var(--muted);margin:0;max-width:230px}
+.shelf{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.sitecard{background:var(--white);border:1px solid var(--line);padding:17px;min-height:190px;display:flex;flex-direction:column;box-shadow:var(--shadow);position:relative}
+.cardtop{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:15px}
+.cardicon{width:34px;height:34px;border:1px solid var(--line);border-radius:50%;display:grid;place-items:center;color:var(--olive);font:14px Georgia,serif}
+.pill{font:9px Arial,sans-serif;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line);padding:5px 7px;color:var(--muted)}
+.sitecard h3{font-size:22px;font-weight:normal;line-height:1.1;margin:0 0 8px;overflow-wrap:anywhere}
+.sitecard .desc{font:12px/1.5 Arial,sans-serif;color:var(--muted);margin:0 0 14px}
+.tags{display:flex;flex-wrap:wrap;gap:5px;margin:0 0 14px}
+.tag{background:var(--paper2);padding:4px 6px;font:10px Arial,sans-serif;color:#5c5b4d}
+.cardfoot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:auto;padding-top:10px;border-top:1px solid var(--line)}
+.cardfoot a{font:11px Arial,sans-serif;text-decoration:none;color:var(--olive);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cardfoot a:hover{text-decoration:underline}
+.card-actions{display:flex;gap:8px;flex-shrink:0}
+.iconbtn{border:0;background:transparent;color:var(--muted);font:11px Arial,sans-serif;padding:3px}
+.iconbtn:hover{color:var(--rust)}
+.empty{grid-column:1/-1;border:1px dashed var(--line);padding:36px;text-align:center;color:var(--muted)}
+.empty strong{display:block;font-size:22px;font-weight:normal;color:var(--ink);margin-bottom:8px}
+.archivebar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:18px 0 10px;padding:13px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);font:11px Arial,sans-serif;color:var(--muted)}
+.count{color:var(--ink)}
+.footer{margin-top:42px;padding-top:14px;border-top:3px double var(--ink);display:flex;justify-content:space-between;gap:15px;font:10px/1.5 Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+dialog{border:1px solid var(--olive);background:var(--paper);color:var(--ink);width:min(560px,calc(100% - 24px));padding:0;box-shadow:0 20px 80px #1e211b40}
+dialog::backdrop{background:#23251dcc}
+.modalhead{padding:20px 22px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.modalhead h2{font-weight:normal;font-size:26px;margin:0}
+.modalbody{padding:22px;display:grid;gap:13px}
+.field{display:grid;gap:6px;font:11px Arial,sans-serif;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.field input,.field textarea,.field select{width:100%;border:1px solid var(--line);background:var(--white);padding:11px;color:var(--ink);font:14px Georgia,serif;text-transform:none;letter-spacing:0}
+.field textarea{min-height:72px;resize:vertical}
+.modalactions{display:flex;justify-content:space-between;gap:10px;padding:0 22px 22px}
+
+.fileinput{display:none}
+.suggestions{display:none;flex-wrap:wrap;gap:5px;margin-top:1px}
+.suggestions button{border:1px solid var(--line);background:var(--paper2);color:var(--ink);padding:6px 8px;font:11px Arial,sans-serif}
+.suggestions button:hover{border-color:var(--olive);background:var(--olive2)}
+.browsecloud{display:flex;flex-wrap:wrap;gap:7px;margin:12px 0 22px}
+.cloudchip{border:1px solid var(--line);background:var(--white);color:var(--ink);padding:8px 10px;font:11px Arial,sans-serif;display:flex;gap:7px;align-items:center}
+.cloudchip span{color:var(--muted);font-size:10px}
+.cloudchip.active,.cloudchip:hover{border-color:var(--olive);background:var(--olive2)}
+.browse-empty{font:12px Arial,sans-serif;color:var(--muted);padding:10px 0}
+
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:12px 17px;font:12px Arial,sans-serif;box-shadow:var(--shadow);display:none;z-index:5}
+.viewtoggle{display:flex;gap:5px}
+.viewtoggle button{border:1px solid var(--line);background:transparent;padding:9px 11px;font:10px Arial,sans-serif;text-transform:uppercase;color:var(--muted)}
+.viewtoggle button.active{background:var(--olive2);color:var(--ink);border-color:var(--olive)}
+.shelf.list{grid-template-columns:1fr;gap:7px}
+.shelf.list .sitecard{min-height:0;display:grid;grid-template-columns:42px minmax(140px,1fr) minmax(150px,2fr) auto;gap:12px;align-items:center;padding:12px 15px}
+.shelf.list .cardtop{margin:0}.shelf.list .pill{display:none}.shelf.list .cardicon{width:32px;height:32px}
+.shelf.list .cardcopy{min-width:0}.shelf.list .sitecard h3{font-size:17px;margin:0 0 4px}.shelf.list .desc{margin:0}
+.shelf.list .tags{margin:0}.shelf.list .cardfoot{border:0;padding:0;margin:0;max-width:180px}
+.shelf.list .card-actions{display:none}
+@media(max-width:850px){.departments{grid-template-columns:repeat(2,minmax(0,1fr))}.shelf{grid-template-columns:repeat(2,minmax(0,1fr))}.toolbar{grid-template-columns:1fr 1fr}.searchwrap{grid-column:1/-1}.shelf.list .sitecard{grid-template-columns:38px 1fr auto}.shelf.list .cardcopy .desc{display:none}.shelf.list .tags{display:none}}
+@media(max-width:540px){.shell{padding:16px 15px 40px}.masthead{grid-template-columns:1fr 85px;gap:12px}.stamp{font-size:8px;padding:8px 4px}.stamp strong{font-size:20px}.subtitle{font-size:15px}.departments{gap:7px}.dept{padding:12px;min-height:135px}.dept h3{font-size:17px}.shelf{grid-template-columns:1fr}.toolbar{grid-template-columns:1fr 1fr}.toolbar .btn{padding:11px 8px;font-size:10px}.sectionhead h2{font-size:23px}.footer{flex-direction:column}.shelf.list .sitecard{grid-template-columns:32px 1fr auto;gap:8px}.shelf.list .cardfoot{max-width:100px}.shelf.list .cardfoot a{max-width:100px}}
+</style>
+</head>
+<body>
+<div class="shell">
+ <div class="topline"><span>Personal reference library · Vol. I</span><span class="status"><span class="dot"></span> A living index</span></div>
+ <header class="masthead">
+  <div><div class="kicker">Collected corners of the web</div><h1>The Internet<br>Cabinet</h1><p class="subtitle">A field guide for curious days, forgotten links, and very long rabbit holes.</p></div>
+  <div class="stamp">Catalogued<br><strong>✳</strong>Since 2026<br>Private edition</div>
+ </header>
+ <hr class="rule">
+ <div class="toolbar">
+  <label class="searchwrap"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="Search names, subjects, notes, tags…" aria-label="Search websites"></label>
+  <button class="btn" id="addBtn">＋ Add a site</button>
+  <button class="btn secondary" id="importBtn">Import / backup</button>
+ </div>
+ <section>
+  <div class="sectionhead"><div><div class="smallcaps">Choose a department</div><h2>Where shall we wander?</h2><p>Browse by curiosity, not by the folder you forgot.</p></div><div style="display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end"><button class="btn secondary" id="allBtn">All departments</button><button class="btn" id="addDeptBtn">＋ Add department</button></div></div>
+  <div class="departments" id="departments"></div>
+ </section>
+ <section>
+  <div class="sectionhead"><div><div class="smallcaps">Cross-reference index</div><h2>Browse by topic</h2><p>Find every website tagged with a subject, across all departments.</p></div></div>
+  <div class="browsecloud" id="topicCloud"></div>
+  <div class="sectionhead"><div><div class="smallcaps">The index tabs</div><h2>Browse by tag</h2><p>Find sites by qualities and use cases, not just subject.</p></div></div>
+  <div class="browsecloud" id="tagCloud"></div>
+ </section>
+ <section>
+  <div class="sectionhead"><div><div class="smallcaps">The collection</div><h2 id="collectionTitle">A few favourite shelves</h2><p id="collectionSub">Your catalogue, arranged for easy rediscovery.</p></div>
+  <div class="viewtoggle"><button class="active" id="gridBtn">Grid</button><button id="listBtn">Index</button></div></div>
+  <div class="archivebar"><span id="filterLabel">All saved websites</span><span><span class="count" id="count">0 entries</span> · <span id="favCount">0 favourites</span></span></div>
+  <div class="shelf" id="shelf"></div>
+ </section>
+ <footer class="footer"><span>The Internet Cabinet · Personal edition</span><span>Keep the link. Keep the curiosity.</span></footer>
+</div>
+
+<dialog id="siteDialog">
+ <form id="siteForm">
+  <div class="modalhead"><h2 id="formTitle">Add to the catalogue</h2><button type="button" class="iconbtn" id="closeSite" aria-label="Close">✕</button></div>
+  <div class="modalbody">
+   <label class="field">Website name *<input id="fTitle" required placeholder="e.g. Biodiversity Heritage Library"></label>
+   <label class="field">Website URL *<input id="fUrl" required type="url" placeholder="https://…"></label>
+   <label class="field">Department<select id="fDept"></select></label>
+   <label class="field">What is it useful for?<textarea id="fDesc" placeholder="A searchable archive of…"></textarea></label>
+   <label class="field">Topics / subcategories <input id="fTopics" autocomplete="off" placeholder="Type a topic; select a suggestion or separate with commas"><div class="suggestions" id="topicSuggestions"></div></label>
+   <label class="field">Tags <input id="fTags" autocomplete="off" placeholder="Type a tag; select a suggestion or separate with commas"><div class="suggestions" id="tagSuggestions"></div></label>
+   <label class="field">Collection status<select id="fPriority"><option value="Favourite">Favourite</option><option value="Frequently used">Frequently used</option><option value="Reference">Reference</option><option value="Explore later" selected>Explore later</option><option value="Revisit">Revisit</option><option value="Archived">Archived</option></select></label>
+   <label class="field">Personal note <textarea id="fNote" placeholder="Why did you save this? What should you remember?"></textarea></label>
+  </div>
+  <div class="modalactions"><button type="button" class="btn secondary" id="deleteBtn" style="display:none">Delete entry</button><div style="display:flex;gap:8px;margin-left:auto"><button type="button" class="btn secondary" id="cancelSite">Cancel</button><button class="btn" type="submit">Save entry</button></div></div>
+ </form>
+</dialog>
+
+<dialog id="dataDialog">
+ <div class="modalhead"><h2>Keep your catalogue safe</h2><button class="iconbtn" id="closeData" aria-label="Close">✕</button></div>
+ <div class="modalbody">
+  <p style="margin:0;line-height:1.5">Import your browser's exported bookmarks HTML, or back up this catalogue as JSON. Imports are added to the current collection; existing entries are not replaced.</p>
+  <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="htmlImport">Import browser HTML</button><button class="btn secondary" id="jsonImport">Restore JSON backup</button><button class="btn secondary" id="jsonExport">Export JSON backup</button><button class="btn secondary" id="htmlExport">Export as bookmarks HTML</button></div>
+  <p style="font:11px/1.5 Arial,sans-serif;color:var(--muted);margin:0">Privacy note: this version saves entries in this browser's local storage. It does not automatically sync between browsers or devices. Export a JSON backup and import it elsewhere, or host a synced version with a secure data store.</p>
+ </div>
+ <div class="modalactions"><span></span><button class="btn secondary" id="doneData">Done</button></div>
+</dialog>
+<input class="fileinput" type="file" id="filePicker" accept=".html,.htm,.json,application/json,text/html">
+<dialog id="deptDialog">
+ <form id="deptForm">
+  <div class="modalhead"><h2>Add a department</h2><button type="button" class="iconbtn" id="closeDept" aria-label="Close">✕</button></div>
+  <div class="modalbody">
+   <p style="margin:0;line-height:1.5">Departments are your broad shelves. Keep them fairly general; use topics and tags to organise the smaller details.</p>
+   <label class="field">Department name *<input id="dName" required maxlength="48" placeholder="e.g. Languages & Linguistics"></label>
+   <label class="field">Short description<input id="dDesc" maxlength="100" placeholder="What belongs on this shelf?"></label>
+   <label class="field">Small symbol (optional)<input id="dGlyph" maxlength="3" placeholder="e.g. ✧"></label>
+  </div>
+  <div class="modalactions"><span></span><div style="display:flex;gap:8px"><button type="button" class="btn secondary" id="cancelDept">Cancel</button><button class="btn" type="submit">Add department</button></div></div>
+ </form>
+</dialog>
+<div class="toast" id="toast" role="status"></div>
+<script>
+const defaultDepartments=[
+ {name:"Literature & Publishing",num:"01",glyph:"❧",desc:"Books, translations, small presses, criticism."},
+ {name:"Libraries & Digital Archives",num:"02",glyph:"▤",desc:"Digitised books, old periodicals, manuscripts."},
+ {name:"Science & Academia",num:"03",glyph:"⚗",desc:"Research, climate science, courses, data."},
+ {name:"Art & Visual Culture",num:"04",glyph:"✳",desc:"Museum collections, illustrations, maps."},
+ {name:"Politics & Ideas",num:"05",glyph:"§",desc:"Political thought, epistemology, essays."},
+ {name:"Nature & Ecology",num:"06",glyph:"❧",desc:"Birds, biodiversity, conservation, ecology."},
+ {name:"Internet Oddities",num:"07",glyph:"⌘",desc:"Personal sites, niche projects, rabbit holes."},
+ {name:"Tools & Workbench",num:"08",glyph:"✎",desc:"Research, writing, design and useful utilities."}
+]; 
+let departments=[...defaultDepartments];
+const STORE="internet-cabinet-v1";
+const DEPT_STORE="internet-cabinet-departments-v1";
+let sites=[], activeDept="", activeTopic="", activeTag="", view="grid", editingId=null, pickerMode="";
+const $=id=>document.getElementById(id);
+function uid(){return "site-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,7)}
+function cleanUrl(raw){try{let u=new URL(raw);if(!["http:","https:"].includes(u.protocol))return "";return u.href}catch{return ""}}
+function save(){try{localStorage.setItem(STORE,JSON.stringify(sites))}catch(e){toast("Could not save locally. Export a backup and check browser storage settings.")}}
+function load(){
+ try{const v=JSON.parse(localStorage.getItem(STORE)||"[]");sites=Array.isArray(v)?v:[]}catch{sites=[]}
+ try{const extra=JSON.parse(localStorage.getItem(DEPT_STORE)||"[]");if(Array.isArray(extra)){departments=[...defaultDepartments,...extra.filter(x=>x&&x.name&&!defaultDepartments.some(d=>d.name.toLowerCase()===x.name.toLowerCase()))]}}catch{departments=[...defaultDepartments]}
+}
+function saveDepartments(){try{localStorage.setItem(DEPT_STORE,JSON.stringify(departments.filter(d=>!defaultDepartments.some(base=>base.name===d.name))))}catch(e){toast("Could not save departments in this browser.")}}
+function toast(msg){const t=$("toast");t.textContent=msg;t.style.display="block";clearTimeout(window._toastTimer);window._toastTimer=setTimeout(()=>t.style.display="none",3200)}
+function esc(s=""){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function domain(url){try{return new URL(url).hostname.replace(/^www\./,"")}catch{return url}}
+function matches(s,q){return [s.title,s.url,s.department,s.description,s.note,s.priority,...(s.topics||[]),...(s.tags||[])].join(" ").toLowerCase().includes(q.toLowerCase())}
+function renderDepartments(){
+ $("departments").innerHTML=departments.map(d=>`<button class="dept ${activeDept===d.name?"active":""}" data-dept="${esc(d.name)}"><span class="num">${d.num} / DEPT.</span><span class="glyph">${d.glyph}</span><h3>${esc(d.name)}</h3><p>${esc(d.desc)}</p></button>`).join("");
+ document.querySelectorAll("[data-dept]").forEach(b=>b.onclick=()=>{activeDept=activeDept===b.dataset.dept?"":b.dataset.dept;render()});
+}
+function renderClouds(){
+ const topicCounts=new Map(),tagCounts=new Map();
+ sites.forEach(s=>{(s.topics||[]).forEach(t=>topicCounts.set(t,(topicCounts.get(t)||0)+1));(s.tags||[]).forEach(t=>tagCounts.set(t,(tagCounts.get(t)||0)+1))});
+ const renderCloud=(target,map,active,kind)=>{const entries=[...map.entries()].sort((a,b)=>a[0].localeCompare(b[0]));$(target).innerHTML=entries.length?entries.map(([name,count])=>`<button class="cloudchip ${active===name?"active":""}" data-${kind}="${esc(name)}">${esc(name)} <span>${count}</span></button>`).join(""):`<div class="browse-empty">Your ${kind==="topic"?"topics":"tags"} will appear here as you add websites.</div>`;
+ document.querySelectorAll(`[data-${kind}]`).forEach(b=>b.onclick=()=>{if(kind==="topic"){activeTopic=activeTopic===b.dataset.topic?"":b.dataset.topic;activeTag=""}else{activeTag=activeTag===b.dataset.tag?"":b.dataset.tag;activeTopic=""}activeDept="";render()})};
+ renderCloud("topicCloud",topicCounts,activeTopic,"topic");renderCloud("tagCloud",tagCounts,activeTag,"tag");
+}
+function render(){
+ renderDepartments();renderClouds();
+ const q=$("search").value.trim();
+ let filtered=sites.filter(s=>(!activeDept||s.department===activeDept)&&(!activeTopic||(s.topics||[]).includes(activeTopic))&&(!activeTag||(s.tags||[]).includes(activeTag))&&(!q||matches(s,q)));
+ if(!q&&!activeDept&&!activeTopic&&!activeTag) filtered.sort((a,b)=>(a.priority==="Favourite"?0:1)-(b.priority==="Favourite"?0:1)||a.title.localeCompare(b.title));
+ else filtered.sort((a,b)=>a.title.localeCompare(b.title));
+ $("collectionTitle").textContent=q?"Search results":activeTopic?`Topic: ${activeTopic}`:activeTag?`Tag: ${activeTag}`:activeDept||"The catalogue";
+ $("collectionSub").textContent=q?"Matching entries across names, notes, URLs, topics and tags.":activeTopic?"Websites filed under this topic across every department.":activeTag?"Websites carrying this tag across every department.":activeDept?"A shelf from your personal internet field guide.":"Your saved websites, organised for rediscovery.";
+ $("filterLabel").textContent=q?`Search: “${q}”`:activeTopic?`Topic: ${activeTopic}`:activeTag?`Tag: ${activeTag}`:activeDept||"All saved websites";
+ $("count").textContent=`${filtered.length} ${filtered.length===1?"entry":"entries"}`;
+ $("favCount").textContent=`${sites.filter(s=>s.priority==="Favourite").length} favourites`;
+ $("shelf").className="shelf"+(view==="list"?" list":"");
+ if(!filtered.length){$("shelf").innerHTML=`<div class="empty"><strong>${sites.length?"Nothing on this shelf yet.":"Your cabinet is waiting to be filled."}</strong>${sites.length?"Try another search or choose a different department.":"Add a favourite website or import your existing browser bookmarks to begin."}</div>`;return}
+ $("shelf").innerHTML=filtered.map((s,i)=>`<article class="sitecard">
+  <div class="cardtop"><span class="cardicon">${esc((s.title||"?").trim().charAt(0).toUpperCase())}</span><span class="pill">${esc(s.priority||"Useful")}</span></div>
+  <div class="cardcopy"><h3>${esc(s.title)}</h3><p class="desc">${esc(s.description||s.note||domain(s.url))}</p></div>
+  <div class="tags">${(s.topics||[]).slice(0,3).map(t=>`<span class="tag">${esc(t)}</span>`).join("")}${(s.tags||[]).slice(0,2).map(t=>`<span class="tag"># ${esc(t)}</span>`).join("")}</div>
+  <div class="cardfoot"><a href="${esc(s.url)}" target="_blank" rel="noopener noreferrer" title="${esc(s.url)}">${esc(domain(s.url))} ↗</a><div class="card-actions"><button class="iconbtn" data-fav="${esc(s.id)}" title="Toggle favourite">${s.priority==="Favourite"?"★":"☆"}</button><button class="iconbtn" data-edit="${esc(s.id)}" title="Edit entry">Edit</button></div></div>
+ </article>`).join("");
+ document.querySelectorAll("[data-edit]").forEach(b=>b.onclick=()=>openSite(sites.find(s=>s.id===b.dataset.edit)));
+ document.querySelectorAll("[data-fav]").forEach(b=>b.onclick=()=>{const s=sites.find(s=>s.id===b.dataset.fav);if(s){s.priority=s.priority==="Favourite"?"Reference":"Favourite";save();render()}});
+}
+function fillDeptSelect(){ $("fDept").innerHTML=departments.map(d=>`<option>${esc(d.name)}</option>`).join("")}
+function knownValues(field){const set=new Set();sites.forEach(s=>(s[field]||[]).forEach(v=>set.add(v)));return [...set].sort((a,b)=>a.localeCompare(b))}
+function setupSuggestions(inputId,boxId,field){
+ const input=$(inputId),box=$(boxId);
+ function update(){
+  const parts=input.value.split(","),fragment=parts[parts.length-1].trim().toLowerCase();
+  const known=knownValues(field).filter(v=>v.toLowerCase().includes(fragment)&&!parts.slice(0,-1).map(x=>x.trim().toLowerCase()).includes(v.toLowerCase()));
+  if(!fragment||!known.length){box.style.display="none";box.innerHTML="";return}
+  box.innerHTML=known.slice(0,8).map(v=>`<button type="button" data-suggestion="${esc(v)}">${esc(v)}</button>`).join("");box.style.display="flex";
+  box.querySelectorAll("[data-suggestion]").forEach(b=>b.onclick=()=>{const prefix=parts.slice(0,-1).map(x=>x.trim()).filter(Boolean);prefix.push(b.dataset.suggestion);input.value=prefix.join(", ")+", ";box.style.display="none";input.focus()});
+ }
+ input.addEventListener("input",update);input.addEventListener("focus",update);
+ input.addEventListener("keydown",e=>{if(e.key==="Escape"){box.style.display="none"}});
+ document.addEventListener("click",e=>{if(!box.contains(e.target)&&e.target!==input)box.style.display="none"});
+}
+function openSite(s=null){
+ editingId=s?s.id:null;$("formTitle").textContent=s?"Edit catalogue entry":"Add to the catalogue";$("deleteBtn").style.display=s?"inline-block":"none";
+ $("fTitle").value=s?.title||"";$("fUrl").value=s?.url||"";$("fDept").value=s?.department||(activeDept||departments[0].name);$("fDesc").value=s?.description||"";$("fTopics").value=(s?.topics||[]).join(", ");$("fTags").value=(s?.tags||[]).join(", ");$("fPriority").value=s?.priority||"Explore later";$("fNote").value=s?.note||"";
+ $("siteDialog").showModal();if(!s)setTimeout(()=>$("fTitle").focus(),50);
+}
+function addSite(s){const url=cleanUrl(s.url||"");if(!url)return false;const key=url.replace(/\/$/,"").toLowerCase();if(sites.some(x=>x.url.replace(/\/$/,"").toLowerCase()===key))return false;sites.push({id:uid(),title:(s.title||domain(url)).trim(),url,department:departments.some(d=>d.name===s.department)?s.department:"Internet Oddities",description:s.description||"",tags:Array.isArray(s.tags)?s.tags:[],priority:s.priority||"Explore later",note:s.note||"",addedAt:new Date().toISOString()});return true}
+function parseBookmarksHtml(text){
+ const doc=new DOMParser().parseFromString(text,"text/html"),out=[];
+ function walk(node,path=[]){for(const child of node.children||[]){if(child.tagName==="DT"){const a=child.querySelector(":scope > A[href]");const h=child.querySelector(":scope > H3");if(a){const url=cleanUrl(a.getAttribute("href"));if(url)out.push({title:a.textContent.trim()||domain(url),url,department:mapFolder(path),description:"",topics:[],tags:[],priority:"Explore later"});}else if(h){const dl=child.querySelector(":scope > DL");if(dl)walk(dl,[...path,h.textContent.trim()]);}else{const dl=child.querySelector(":scope > DL");if(dl)walk(dl,path)}}else if(child.tagName==="DL")walk(child,path)}}
+ const root=doc.querySelector("DL");if(root)walk(root,[]);else doc.querySelectorAll("a[href]").forEach(a=>{const url=cleanUrl(a.href);if(url)out.push({title:a.textContent.trim()||domain(url),url,department:"Internet Oddities",topics:[],tags:[]})});
+ return out;
+}
+function mapFolder(path){const p=path.join(" ").toLowerCase();if(/book|liter|novel|press|read/.test(p))return "Literature & Publishing";if(/archive|library|digital|periodical/.test(p))return "Libraries & Digital Archives";if(/science|chem|climate|research|course|academic/.test(p))return "Science & Academia";if(/art|design|museum|image|photo/.test(p))return "Art & Visual Culture";if(/politic|philosoph|idea|journalism/.test(p))return "Politics & Ideas";if(/bird|nature|wildlife|eco|environment|conservation/.test(p))return "Nature & Ecology";if(/tool|utility|work|writing/.test(p))return "Tools & Workbench";return "Internet Oddities"}
+function download(name,content,type){const blob=new Blob([content],{type}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1200)}
+function exportJson(){download("internet-cabinet-backup.json",JSON.stringify({version:2,exportedAt:new Date().toISOString(),sites,customDepartments:departments.filter(d=>!defaultDepartments.some(base=>base.name===d.name))},null,2),"application/json");toast("JSON backup downloaded. Keep it somewhere safe.")}
+function exportHtml(){const escHtml=s=>String(s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;");const items=sites.map(s=>`<DT><A HREF="${escHtml(s.url)}" ADD_DATE="0">${escHtml(s.title)}</A>`).join("\n");download("internet-cabinet-bookmarks.html",`<!DOCTYPE NETSCAPE-Bookmark-file-1>\n<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">\n<TITLE>Internet Cabinet</TITLE><H1>Internet Cabinet</H1><DL><p>\n${items}\n</DL><p>`,"text/html");toast("Browser-compatible bookmarks HTML downloaded.")}
+function openData(){ $("dataDialog").showModal() }
+$("addBtn").onclick=()=>openSite();$("allBtn").onclick=()=>{activeDept="";activeTopic="";activeTag="";render()};$("search").addEventListener("input",render);
+$("gridBtn").onclick=()=>{view="grid";$("gridBtn").classList.add("active");$("listBtn").classList.remove("active");render()};
+$("listBtn").onclick=()=>{view="list";$("listBtn").classList.add("active");$("gridBtn").classList.remove("active");render()};
+$("importBtn").onclick=openData;$("closeSite").onclick=$("cancelSite").onclick=()=>$("siteDialog").close();$("closeData").onclick=$("doneData").onclick=()=>$("dataDialog").close();
+$("siteForm").onsubmit=e=>{e.preventDefault();const url=cleanUrl($("fUrl").value);if(!url){toast("Please enter a valid http or https URL.");return}const item={id:editingId||uid(),title:$("fTitle").value.trim(),url,department:$("fDept").value,description:$("fDesc").value.trim(),topics:$("fTopics").value.split(",").map(x=>x.trim()).filter(Boolean),tags:$("fTags").value.split(",").map(x=>x.trim()).filter(Boolean),priority:$("fPriority").value,note:$("fNote").value.trim(),addedAt:new Date().toISOString()};if(editingId){const idx=sites.findIndex(s=>s.id===editingId);if(idx>=0)sites[idx]=item}else if(sites.some(s=>s.url.replace(/\/$/,"").toLowerCase()===url.replace(/\/$/,"").toLowerCase())){toast("That URL is already in your catalogue.");return}else sites.push(item);save();$("siteDialog").close();render();toast(editingId?"Entry updated.":"Entry added to the cabinet.")};
+$("deleteBtn").onclick=()=>{if(editingId&&confirm("Delete this catalogue entry? Export a backup first if you may want it later.")){sites=sites.filter(s=>s.id!==editingId);save();$("siteDialog").close();render();toast("Entry deleted.")}};
+$("htmlImport").onclick=()=>{pickerMode="html";$("filePicker").accept=".html,.htm,text/html";$("filePicker").click()};
+$("jsonImport").onclick=()=>{pickerMode="json";$("filePicker").accept=".json,application/json";$("filePicker").click()};
+$("jsonExport").onclick=exportJson;$("htmlExport").onclick=exportHtml;
+$("filePicker").onchange=async e=>{const file=e.target.files[0];if(!file)return;try{const txt=await file.text();let imported=[];if(pickerMode==="html")imported=parseBookmarksHtml(txt);else{const data=JSON.parse(txt);imported=Array.isArray(data)?data:(data.sites||[]);if(data.customDepartments&&Array.isArray(data.customDepartments)){data.customDepartments.forEach(d=>{if(d.name&&!departments.some(x=>x.name.toLowerCase()===d.name.toLowerCase()))departments.push({...d,custom:true})});saveDepartments();fillDeptSelect()}}let added=0,dupes=0;for(const s of imported){if(addSite(s))added++;else dupes++}save();render();$("dataDialog").close();toast(`Imported ${added} entries; skipped ${dupes} invalid or duplicate links.`)}catch(err){toast("Could not read that file. Try exporting bookmarks as HTML or use a valid JSON backup.")}e.target.value=""};
+$("addDeptBtn").onclick=()=>{$("dName").value="";$("dDesc").value="";$("dGlyph").value="✧";$("deptDialog").showModal();setTimeout(()=>$("dName").focus(),50)};
+$("closeDept").onclick=$("cancelDept").onclick=()=>$("deptDialog").close();
+$("deptForm").onsubmit=e=>{
+ e.preventDefault();
+ const name=$("dName").value.trim();
+ if(!name){toast("Give your department a name.");return}
+ if(departments.some(d=>d.name.toLowerCase()===name.toLowerCase())){toast("A department with that name already exists.");return}
+ departments.push({name,num:String(departments.length+1).padStart(2,"0"),glyph:$("dGlyph").value.trim()||"✧",desc:$("dDesc").value.trim()||"A shelf for related websites.",custom:true});
+ saveDepartments();fillDeptSelect();activeDept=name;activeTopic="";activeTag="";$("deptDialog").close();render();toast("New department added.");
+};
+fillDeptSelect();load();fillDeptSelect();setupSuggestions("fTopics","topicSuggestions","topics");setupSuggestions("fTags","tagSuggestions","tags");render();
+</script>
+</body>
+</html>
