@@ -25,6 +25,7 @@ h1{font-size:clamp(42px,7vw,84px);font-weight:normal;letter-spacing:-.055em;line
 .stamp strong{display:block;font:normal 26px Georgia,serif;letter-spacing:0;padding:5px}
 .rule{border:0;border-top:3px double var(--ink);margin:4px 0 22px}
 .toolbar{display:grid;grid-template-columns:minmax(180px,1fr) auto auto;gap:10px;margin:18px 0 24px;align-items:center}
+.cloudpanel{border:1px solid var(--line);background:var(--paper2);padding:13px 15px;margin:0 0 22px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;font:12px Arial,sans-serif}.cloudpanel input{min-width:190px;flex:1;border:1px solid var(--line);background:var(--white);padding:10px;color:var(--ink)}.cloudstate{color:var(--muted);margin-right:auto}.cloudstate strong{color:var(--olive)}
 .searchwrap{display:flex;gap:10px;align-items:center;border:1px solid var(--line);background:var(--white);padding:0 13px;min-height:46px}
 .searchwrap input{border:0;outline:0;background:transparent;width:100%;font:14px Arial,sans-serif}
 .btn{border:1px solid var(--olive);background:var(--olive);color:#fffdf4;padding:12px 15px;font:11px Arial,sans-serif;letter-spacing:.07em;text-transform:uppercase}
@@ -109,6 +110,13 @@ dialog::backdrop{background:#23251dcc}
   <button class="btn" id="addBtn">＋ Add a site</button>
   <button class="btn secondary" id="importBtn">Import / backup</button>
  </div>
+ <div class="cloudpanel" aria-label="Cloud sync">
+  <span class="cloudstate" id="cloudState"><strong>Cloud cabinet:</strong> not signed in</span>
+  <input id="authEmail" type="email" placeholder="Your email for sign-in" aria-label="Email address">
+  <button class="btn" id="signInBtn">Email me a sign-in link</button>
+  <button class="btn secondary" id="syncBtn" disabled>Sync now</button>
+  <button class="btn secondary" id="signOutBtn" disabled>Sign out</button>
+ </div>
  <section>
   <div class="sectionhead"><div><div class="smallcaps">Choose a department</div><h2>Where shall we wander?</h2><p>Browse by curiosity, not by the folder you forgot.</p></div><div style="display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end"><button class="btn secondary" id="allBtn">All departments</button><button class="btn" id="addDeptBtn">＋ Add department</button></div></div>
   <div class="departments" id="departments"></div>
@@ -150,7 +158,7 @@ dialog::backdrop{background:#23251dcc}
  <div class="modalbody">
   <p style="margin:0;line-height:1.5">Import your browser's exported bookmarks HTML, or back up this catalogue as JSON. Imports are added to the current collection; existing entries are not replaced.</p>
   <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="htmlImport">Import browser HTML</button><button class="btn secondary" id="jsonImport">Restore JSON backup</button><button class="btn secondary" id="jsonExport">Export JSON backup</button><button class="btn secondary" id="htmlExport">Export as bookmarks HTML</button></div>
-  <p style="font:11px/1.5 Arial,sans-serif;color:var(--muted);margin:0">Privacy note: this version saves entries in this browser's local storage. It does not automatically sync between browsers or devices. Export a JSON backup and import it elsewhere, or host a synced version with a secure data store.</p>
+  <p style="font:11px/1.5 Arial,sans-serif;color:var(--muted);margin:0">Privacy note: entries are saved in this browser and, after you sign in, can sync to your private Supabase account. Keep exporting occasional JSON backups as an extra precaution. Only your signed-in account can read its cloud row.</p>
  </div>
  <div class="modalactions"><span></span><button class="btn secondary" id="doneData">Done</button></div>
 </dialog>
@@ -168,7 +176,12 @@ dialog::backdrop{background:#23251dcc}
  </form>
 </dialog>
 <div class="toast" id="toast" role="status"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+const SUPABASE_URL="https://nrpesqvjtmoijaxjnkeq.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY="sb_publishable_cBhReXT3pTrWjDptQG7GTg_sKHW6Hur";
+const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+let cloudUser=null, cloudReady=false, cloudLoading=false, cloudTimer=null, syncing=false;
 const defaultDepartments=[
  {name:"Literature & Publishing",num:"01",glyph:"❧",desc:"Books, translations, small presses, criticism."},
  {name:"Libraries & Digital Archives",num:"02",glyph:"▤",desc:"Digitised books, old periodicals, manuscripts."},
@@ -186,12 +199,12 @@ let sites=[], activeDept="", activeTopic="", activeTag="", view="grid", editingI
 const $=id=>document.getElementById(id);
 function uid(){return "site-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,7)}
 function cleanUrl(raw){try{let u=new URL(raw);if(!["http:","https:"].includes(u.protocol))return "";return u.href}catch{return ""}}
-function save(){try{localStorage.setItem(STORE,JSON.stringify(sites))}catch(e){toast("Could not save locally. Export a backup and check browser storage settings.")}}
+function save(){try{localStorage.setItem(STORE,JSON.stringify(sites));scheduleCloudSave()}catch(e){toast("Could not save locally. Export a backup and check browser storage settings.")}}
 function load(){
  try{const v=JSON.parse(localStorage.getItem(STORE)||"[]");sites=Array.isArray(v)?v:[]}catch{sites=[]}
  try{const extra=JSON.parse(localStorage.getItem(DEPT_STORE)||"[]");if(Array.isArray(extra)){departments=[...defaultDepartments,...extra.filter(x=>x&&x.name&&!defaultDepartments.some(d=>d.name.toLowerCase()===x.name.toLowerCase()))]}}catch{departments=[...defaultDepartments]}
 }
-function saveDepartments(){try{localStorage.setItem(DEPT_STORE,JSON.stringify(departments.filter(d=>!defaultDepartments.some(base=>base.name===d.name))))}catch(e){toast("Could not save departments in this browser.")}}
+function saveDepartments(){try{localStorage.setItem(DEPT_STORE,JSON.stringify(departments.filter(d=>!defaultDepartments.some(base=>base.name===d.name))));scheduleCloudSave()}catch(e){toast("Could not save departments in this browser.")}}
 function toast(msg){const t=$("toast");t.textContent=msg;t.style.display="block";clearTimeout(window._toastTimer);window._toastTimer=setTimeout(()=>t.style.display="none",3200)}
 function esc(s=""){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function domain(url){try{return new URL(url).hostname.replace(/^www\./,"")}catch{return url}}
@@ -281,7 +294,58 @@ $("deptForm").onsubmit=e=>{
  departments.push({name,num:String(departments.length+1).padStart(2,"0"),glyph:$("dGlyph").value.trim()||"✧",desc:$("dDesc").value.trim()||"A shelf for related websites.",custom:true});
  saveDepartments();fillDeptSelect();activeDept=name;activeTopic="";activeTag="";$("deptDialog").close();render();toast("New department added.");
 };
-fillDeptSelect();load();fillDeptSelect();setupSuggestions("fTopics","topicSuggestions","topics");setupSuggestions("fTags","tagSuggestions","tags");render();
+function cloudPayload(){return {sites,customDepartments:departments.filter(d=>!defaultDepartments.some(base=>base.name===d.name))}}
+function setCloudState(msg){$("cloudState").innerHTML="<strong>Cloud cabinet:</strong> "+esc(msg)}
+function updateAuthButtons(){ $("syncBtn").disabled=!cloudUser;$("signOutBtn").disabled=!cloudUser;$("signInBtn").disabled=!!cloudUser;$("authEmail").disabled=!!cloudUser; }
+function scheduleCloudSave(){if(!cloudUser||!cloudReady||syncing)return;clearTimeout(cloudTimer);cloudTimer=setTimeout(()=>syncToCloud(true),1200)}
+async function syncToCloud(quiet=false){
+ if(!cloudUser){if(!quiet)toast("Sign in first to sync your Cabinet.");return}
+ if(syncing)return;syncing=true;setCloudState("syncing…");
+ try{
+  const payload=cloudPayload();
+  const {error}=await supabaseClient.from("cabinet_data").upsert({user_id:cloudUser.id,data:payload,updated_at:new Date().toISOString()},{onConflict:"user_id"});
+  if(error)throw error;setCloudState("synced · "+new Date().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"}));if(!quiet)toast("Your Cabinet is synced to the cloud.");
+ }catch(e){console.error(e);setCloudState("sync failed — check setup");if(!quiet)toast("Cloud sync failed: "+(e.message||"check your Supabase setup"))}
+ finally{syncing=false}
+}
+async function loadCloud(){
+ if(!cloudUser||cloudLoading)return;
+ cloudLoading=true;setCloudState("checking your cloud cabinet…");
+ try{
+  const {data,error}=await supabaseClient.from("cabinet_data").select("data").eq("user_id",cloudUser.id).maybeSingle();
+  if(error)throw error;
+  const localHasData=sites.length>0||departments.some(d=>!defaultDepartments.some(b=>b.name===d.name));
+  if(data&&data.data){
+   let useCloud=!localHasData;
+   if(localHasData)useCloud=confirm("A cloud Cabinet already exists. Choose OK to load the cloud copy onto this device (replacing its current local collection), or Cancel to keep this device's collection and upload it to the cloud instead. Export a backup first if unsure.");
+   if(useCloud){
+    const payload=data.data;sites=Array.isArray(payload.sites)?payload.sites:[];
+    departments=[...defaultDepartments,...(Array.isArray(payload.customDepartments)?payload.customDepartments:[]).filter(x=>x&&x.name&&!defaultDepartments.some(d=>d.name.toLowerCase()===x.name.toLowerCase()))];
+    localStorage.setItem(STORE,JSON.stringify(sites));saveDepartments();fillDeptSelect();render();setCloudState("cloud copy loaded");toast("Cloud Cabinet loaded on this device.");
+   }else{await syncToCloud(false)}
+  }else{await syncToCloud(false)}
+  cloudReady=true;
+ }catch(e){console.error(e);setCloudState("connection error");toast("Could not load cloud data: "+(e.message||"check your Supabase table and policies"))}
+ finally{cloudLoading=false}
+}
+async function applySession(session){
+ const nextUser=session?.user||null;
+ if(nextUser&&cloudUser?.id===nextUser.id&&(cloudReady||cloudLoading))return;
+ cloudUser=nextUser;updateAuthButtons();
+ if(cloudUser){setCloudState("signed in as "+cloudUser.email);await loadCloud()}
+ else{cloudReady=false;setCloudState("not signed in")}
+}
+$("signInBtn").onclick=async()=>{
+ const email=$("authEmail").value.trim();if(!email){toast("Enter your email address first.");return}
+ setCloudState("sending sign-in link…");
+ try{const {error}=await supabaseClient.auth.signInWithOtp({email,options:{emailRedirectTo:window.location.href.split("#")[0]}});if(error)throw error;setCloudState("check your email for the sign-in link");toast("Sign-in link sent. Open it on this device to finish signing in.")}
+ catch(e){console.error(e);setCloudState("sign-in failed");toast("Could not send sign-in link: "+(e.message||"check Auth settings"))}
+};
+$("syncBtn").onclick=()=>syncToCloud(false);
+$("signOutBtn").onclick=async()=>{const {error}=await supabaseClient.auth.signOut();if(error){toast("Could not sign out.");return}cloudUser=null;cloudReady=false;updateAuthButtons();setCloudState("signed out · local copy remains on this device");toast("Signed out. Your local copy remains here.")};
+supabaseClient.auth.onAuthStateChange((_event,session)=>{setTimeout(()=>applySession(session),0)});
+fillDeptSelect();load();fillDeptSelect();setupSuggestions("fTopics","topicSuggestions","topics");setupSuggestions("fTags","tagSuggestions","tags");render();updateAuthButtons();
+supabaseClient.auth.getSession().then(({data})=>applySession(data.session));
 </script>
 </body>
 </html>
